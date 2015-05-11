@@ -63,6 +63,7 @@ public:
 
     bool arkIsOK;
     bool behIsOk;
+    bool comBlOk;
 public slots:
     void examineChildElements(const QWebElement &parentElement);
     void parseArk(const QByteArray& arr);

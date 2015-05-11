@@ -12,6 +12,7 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     arkIsOK = false;
     behIsOk  = false;
+    comBlOk = false;
     m_View =new  QWebView();
     QStringList lst;
     initThreeThreads();
@@ -84,15 +85,21 @@ void Widget::parseArk(const QByteArray &arr)
     QList<QWebElement> elst = introSpans.toList();
     ui->textEdit->clear();
     for(int i = 0;i<elst.count();i++){
-        qDebug()<<"-------------ARKPHARM data--------------- "<<elst.at(i).attribute("value")<< " \n"<<elst.at(i).attribute("id");
-        ui->textEdit->append(elst.at(i).attribute("value")+": "+elst.at(i).attribute("id"));
+        QString value = elst.at(i).attribute("value");
+        QString id = elst.at(i).attribute("id");
+        qDebug()<<"-------------ARKPHARM data--------------- "<<value<< " \n"<<id;
+        if(id.contains("Hidden") || id.contains("WeightValue") || value.isEmpty()){
+            continue;
+        }
+        ui->textEdit->append(value);
     }
     if(elst.isEmpty()){
         ui->textEdit->append(tr("未找到相关产品"));
     }
     arkIsOK = true;
-    if(arkIsOK && behIsOk){
+    if(arkIsOK && behIsOk && comBlOk){
         ui->pushButton->setEnabled(true);
+        ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
     }
 }
 
@@ -110,17 +117,21 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
         QStringList secondResult;
         secondResult.clear();
         for(int i = 0;i<elst.count();i++){
-            qDebug()<<"-------------BEPHARM data--------------- "<<elst.at(i).attribute("value")<< " \n"<<elst.at(i).attribute("id");
-            if(!elst.at(i).attribute("id").isEmpty()){
-                ui->textEdit_2->append(elst.at(i).attribute("value")+": "+elst.at(i).attribute("id"));
+            QString value = elst.at(i).attribute("value");
+            QString id = elst.at(i).attribute("id");
+            qDebug()<<"-------------BEPHARM data--------------- "<<value<< " \n"<<id;
+            if(id.isEmpty() || value.isEmpty() || id.contains("WeightValue")){
+                continue;
             }else{
-                ui->textEdit_2->append(tr("未找到该产品价格"));
-                ui->label_5->setText(tr("未找到该产品价格"));
+//                ui->textEdit_2->append(tr("未找到该产品价格"));
+//                ui->label_5->setText(tr("未找到该产品价格"));
             }
+            ui->textEdit_2->append(value);
         }
         behIsOk = true;
-        if(arkIsOK && behIsOk){
+        if(arkIsOK && behIsOk && comBlOk){
             ui->pushButton->setEnabled(true);
+            ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
         }
     }
 }
@@ -128,7 +139,28 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
 void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
 {
     qDebug()<<"parseComBlock "<<arr.size();
-    ui->textEdit_3->setText(QString(arr));
+//    ui->textEdit_3->setText(QString(arr));
+    QWebFrame *frame =m_View->page()->mainFrame();
+    frame->setHtml(QString(arr));
+    QWebElement document = frame->documentElement();
+    QWebElementCollection introSpans = document.findAll("TD[ALIGN=right]");
+    QList<QWebElement> elst = introSpans.toList();
+    ui->textEdit_3->clear();
+    for(int i = 0;i<elst.count();i++){
+        comBlOk = true;
+        QString value = elst.at(i).toInnerXml();
+        if(value.contains("<input") || value.isEmpty() || value.contains("Others")){
+            continue;
+        }
+        ui->textEdit_3->append(elst.at(i).toInnerXml());
+    }
+    if(elst.isEmpty()){
+        ui->textEdit_3->append(tr("未找到相关产品"));
+    }
+    if(arkIsOK && behIsOk && comBlOk){
+        ui->pushButton->setEnabled(true);
+        ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+    }
 }
 
 void Widget::appendStatus(QString msg)
@@ -155,8 +187,8 @@ void Widget::on_pushButton_clicked()
     m_BEH->setCode(ui->lineEdit->text());
     m_COMB->setCode(ui->lineEdit->text());
     if(!isFirstBe){
-        //m_ARK->start();
-        //m_BEH->start();
+        m_ARK->start();
+        m_BEH->start();
         m_COMB->start();
         isFirstBe = true;
     }else{
