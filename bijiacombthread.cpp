@@ -1,7 +1,7 @@
 ﻿#include "BiJiaCOMBThread.h"
 
 BiJiaCOMBThread::BiJiaCOMBThread(QObject *parent) :
-    QThread(parent),manager(NULL),isFirst(true),cookie("")
+    QThread(parent),manager(NULL),isFirst(true),cookie(""),isSecond(false)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply*)),
@@ -48,6 +48,7 @@ void BiJiaCOMBThread::startEnd()
 {
     //https://www.combi-blocks.com/cgi-bin/cbp.cgi
     qDebug()<<" 第二次请求 "<<QSslSocket::supportsSsl();
+    isSecond = false;
     QByteArray content;
     content.clear();
     content.append("Input=");
@@ -70,9 +71,6 @@ void BiJiaCOMBThread::replyFinished(QNetworkReply *reply)
 //    foreach (QByteArray arr, reply->rawHeaderList()) {
 //        qDebug()<<" header "<<arr << "-------> " <<reply->rawHeader(arr);
 //    }
-    //网页重定向
-    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-
     if(reply->error() ==QNetworkReply::NoError && isFirst){
         cookie = reply->rawHeader("Set-Cookie");
         qDebug()<<"第一次返回 "<<cookie;
@@ -81,7 +79,7 @@ void BiJiaCOMBThread::replyFinished(QNetworkReply *reply)
     }
     if(!isFirst){       
         QByteArray arr = reply->readAll();
-        qDebug()<<"第二次返回 "<<arr;
+        //qDebug()<<"第二次返回 "<<arr;
         //emit signalMessageShow(tr("正在返回最终的数据............"));
         emit signalSendFinalData(arr,false);
         QFile file("./com.html");
