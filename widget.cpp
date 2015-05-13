@@ -1,6 +1,10 @@
 ﻿#include "widget.h"
 #include "ui_widget.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
+#else
+#define QStringLiteral(str)  QString::fromUtf8(str)
+#endif
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget),m_View(NULL),
@@ -11,6 +15,11 @@ Widget::Widget(QWidget *parent) :
     m_OAK(NULL)
 {
     ui->setupUi(this);
+
+    setWindowFlags(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+    //初始化为未按下鼠标左键
+    mouse_press = false;
     arkIsOK = false;
     behIsOk  = false;
     comBlOk = false;
@@ -26,7 +35,7 @@ Widget::Widget(QWidget *parent) :
     bool ok = db.open();
     qDebug()<<" opened? "<<ok;
     connect(ui->comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(setCurrentCas(QString)));
-    QSqlQuery query("SELECT cas FROM arkdata order by id limit 100");
+    QSqlQuery query("SELECT cas FROM arkdata order by id limit 200");
       while (query.next()) {
           QString country = query.value(0).toString();
           lst.append(country);
@@ -88,7 +97,7 @@ void Widget::startPost(const QUrl &url)
 void Widget::parseArk(const QByteArray &arr)
 {
     QWebFrame *frame =m_View->page()->mainFrame();
-    frame->setHtml(QString(arr));
+    frame->setHtml((arr));
     QWebElement document = frame->documentElement();
     QWebElementCollection introSpans = document.findAll("input[type=hidden]");
     QList<QWebElement> elst = introSpans.toList();
@@ -103,19 +112,21 @@ void Widget::parseArk(const QByteArray &arr)
         ui->textEdit->append(value);
     }
     if(elst.isEmpty()){
-        ui->textEdit->append(tr("未找到相关产品"));
+        ui->textEdit->append(QStringLiteral("未找到相关产品"));
     }
     arkIsOK = true;
-    if(arkIsOK && behIsOk && comBlOk){
+    qDebug()<<QStringLiteral("ARK价格获取完毕--------------------------------");
+
+    if(arkIsOK && behIsOk && comBlOk && oakOK){
         ui->pushButton->setEnabled(true);
-        ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+        ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
     }
 }
 
 void Widget::parseBeh(const QByteArray &arr, bool isFirst)
 {
     QWebFrame *frame =m_View->page()->mainFrame();
-    frame->setHtml(QString(arr));
+    frame->setHtml(arr);
     QWebElement document = frame->documentElement();
     if(isFirst){
         ui->textEdit_2->clear();
@@ -138,25 +149,26 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
             ui->textEdit_2->append(value);
         }
         behIsOk = true;
-        if(arkIsOK && behIsOk && comBlOk){
+        qDebug()<<QStringLiteral("BEHM价格获取完毕--------------------------------");
+
+        if(arkIsOK && behIsOk && comBlOk && oakOK){
             ui->pushButton->setEnabled(true);
-            ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+            ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
         }
     }
 }
 
 void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
 {
-    qDebug()<<"parseComBlock "<<arr.size();
-//    ui->textEdit_3->setText(QString(arr));
+//    qDebug()<<"parseComBlock "<<arr.size();
+//    ui->textEdit_3->setText(QStringLiteral(arr));
     QWebFrame *frame =m_View->page()->mainFrame();
-    frame->setHtml(QString(arr));
+    frame->setHtml((arr));
     QWebElement document = frame->documentElement();
     QWebElementCollection introSpans = document.findAll("TD[ALIGN=right]");
     QList<QWebElement> elst = introSpans.toList();
     ui->textEdit_3->clear();
     for(int i = 0;i<elst.count();i++){
-        comBlOk = true;
         QString value = elst.at(i).toInnerXml();
         if(value.contains("<input") || value.isEmpty() || value.contains("Others")){
             continue;
@@ -164,18 +176,20 @@ void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
         ui->textEdit_3->append(elst.at(i).toInnerXml());
     }
     if(elst.isEmpty()){
-        ui->textEdit_3->append(tr("未找到相关产品"));
+        ui->textEdit_3->append(QStringLiteral("未找到相关产品"));
     }
-    if(arkIsOK && behIsOk && comBlOk){
+    qDebug()<<QStringLiteral("COMBLOCKS价格获取完毕--------------------------------");
+    comBlOk = true;
+    if(arkIsOK && behIsOk && comBlOk && oakOK){
         ui->pushButton->setEnabled(true);
-        ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+        ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
     }
 }
 
 void Widget::parseOAkChemical(const QByteArray &arr, bool isFirst)
 {
     QWebFrame *frame =m_View->page()->mainFrame();
-    frame->setHtml(QString(arr));
+    frame->setHtml((arr));
     QWebElement document = frame->documentElement();
     if(isFirst){
         ui->textEdit_4->clear();
@@ -192,15 +206,17 @@ void Widget::parseOAkChemical(const QByteArray &arr, bool isFirst)
             if(id.isEmpty() || value.isEmpty() || id.contains("WeightValue")){
                 continue;
             }else{
-//                ui->textEdit_2->append(tr("未找到该产品价格"));
-//                ui->label_5->setText(tr("未找到该产品价格"));
             }
             ui->textEdit_4->append(value);
         }
         oakOK = true;
-        if(arkIsOK && behIsOk && comBlOk){
+        qDebug()<<QStringLiteral("OAKCHEMICAL价格获取完毕--------------------------------");
+        if(arr.isEmpty()){
+            ui->textEdit_4->setText(QStringLiteral("未找到相关产品"));
+        }
+        if(arkIsOK && behIsOk && comBlOk && oakOK){
             ui->pushButton->setEnabled(true);
-            ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+            ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
         }
     }
 }
@@ -262,8 +278,8 @@ void Widget::examineChildElements(const QWebElement &parentElement,bool isBeh)
     beUrl.prepend("http://www.bepharm.com");
     beUrl.append(storedText);
     if(storedText.isEmpty()){
-        ui->textEdit_2->append(tr("未找到相关产品信息"));
-        ui->label_5->setText(tr("未找到相关产品信息"));
+        ui->textEdit_2->append(QStringLiteral("未找到相关产品信息"));
+        ui->label_5->setText(QStringLiteral("未找到相关产品信息"));
         return;
     }
     if(m_BEH){
@@ -271,6 +287,60 @@ void Widget::examineChildElements(const QWebElement &parentElement,bool isBeh)
     }
     }else{
         //解析oakchemical数据
-
+        m_OAK->secondStart(QUrl(""));
     }
+}
+void Widget::paintEvent(QPaintEvent *)
+{
+    QPainterPath path;
+    path.setFillRule(Qt::WindingFill);
+    int rate = 8;
+    path.addRect(rate, rate, this->width()-rate*2, this->height()-rate*2);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.fillPath(path, QBrush(Qt::white));
+
+    QColor color(0, 0, 0, 50);
+    for(int i=0; i<rate; i++)
+    {
+        QPainterPath path;
+        path.setFillRule(Qt::WindingFill);
+        path.addRect(rate-i, rate-i, this->width()-(rate-i)*2, this->height()-(rate-i)*2);
+        color.setAlpha(150 - qSqrt(i)*50);
+        painter.setPen(color);
+        painter.drawPath(path);
+    }
+}
+
+void Widget::mousePressEvent(QMouseEvent *event)
+{
+    //只能是鼠标左键移动和改变大小
+    if(event->button() == Qt::LeftButton)
+    {
+        mouse_press = true;
+    }
+
+    //窗口移动距离
+    move_point = event->globalPos() - pos();
+}
+
+void Widget::mouseReleaseEvent(QMouseEvent *)
+{
+    mouse_press = false;
+}
+
+void Widget::mouseMoveEvent(QMouseEvent *event)
+{
+    //移动窗口
+    if(mouse_press)
+    {
+        QPoint move_pos = event->globalPos();
+        move(move_pos - move_point);
+    }
+}
+void Widget::on_closeBtn_clicked()
+{
+    this->close();
+    qApp->quit();
 }

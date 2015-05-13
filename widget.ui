@@ -22,10 +22,31 @@
     selection-background-color: darkgray;
 }
 QPushButton {
-    background-color: red;
+    background-color: #414141;
+    border-width: 1px;
     border-style: outset;
-    border-width: 2px;
     border-color: beige;
+    color:white;
+}
+#closeBtn{
+
+    border-style: outset;
+    border-width: 0px;
+    border-color: beige;
+	background-image: url(:/close_hover.png);
+}
+
+QPushButton:hover{
+    background-color: #404040;
+    border-width: 0px;
+    border-color: beige;
+    color:white;
+}
+#closeBtn:hover{
+    background-color: #404040;
+    border-style: outset;
+    border-width: 0px;
+	background-image: url(:/close_pressed.png);
 }
 QComboBox {
     border: 1px solid gray;
@@ -75,25 +96,106 @@ QComboBox::down-arrow {
 QComboBox::down-arrow:on { /* shift the arrow when popup is open */
     top: 1px;
     left: 1px;
+}
+QLabel{
+   color:#414141;
 }</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>准备数据......</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Qt版本比价工具</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>准备数据......</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeBtn">
+       <property name="minimumSize">
+        <size>
+         <width>27</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
-        <string>产品代码: </string>
+        <string>产品代码:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -108,7 +210,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
       <widget class="QComboBox" name="comboBox">
        <property name="minimumSize">
         <size>
-         <width>119</width>
+         <width>95</width>
          <height>0</height>
         </size>
        </property>
@@ -116,24 +218,27 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="label_2">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="text">
-        <string>ArkHarminc:  </string>
+        <string> ArkHarmic</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -142,24 +247,27 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="3" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label_3">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="text">
-        <string>Bepharm:     </string>
+        <string> Bepharm</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -168,24 +276,27 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      </item>
     </layout>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label_4">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="text">
-        <string>COMBI-BLOCKS:</string>
+        <string>COMBLOCKS:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -194,12 +305,27 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      </item>
     </layout>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="5" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="label_6">
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
-        <string>OAK_CHEMICAL:   </string>
+        <string>OAK_CHEMI:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -208,8 +334,20 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      </item>
     </layout>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="6" column="0">
     <widget class="QPushButton" name="pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="text">
       <string>进行比价</string>
      </property>

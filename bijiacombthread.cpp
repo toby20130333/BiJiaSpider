@@ -1,5 +1,9 @@
 ﻿#include "BiJiaCOMBThread.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
+#else
+#define QStringLiteral(str)  QString::fromUtf8(str)
+#endif
 BiJiaCOMBThread::BiJiaCOMBThread(QObject *parent) :
     QThread(parent),manager(NULL),isFirst(true),cookie(""),isSecond(false)
 {
@@ -24,7 +28,7 @@ void BiJiaCOMBThread::setCode(const QString &code)
 void BiJiaCOMBThread::startSplider(const QUrl& url)
 {
     //https://www.combi-blocks.com/cgi-bin/cbp.cgi
-    qDebug()<<" BiJiaCOMBThread startLoad "<<QSslSocket::supportsSsl();
+    qDebug()<<QStringLiteral("COMBLOCKS开始请求数据:请求地址为: ")<<url<<QStringLiteral(" 是否支持ssl?")<<QSslSocket::supportsSsl();
     QByteArray content;
     content.clear();
     content.append("MY_ACTION:LOGIN&THE_USERNAME:toby520&THE_PWD:13873864");
@@ -40,7 +44,7 @@ void BiJiaCOMBThread::startSplider(const QUrl& url)
     conf.setProtocol(QSsl::SslV3);
     req.setSslConfiguration(conf);
 
-    qDebug()<<" contentLength:  "<<contentLength;
+    //qDebug()<<" contentLength:  "<<contentLength;
     manager->post(req,content);    
 }
 
@@ -61,26 +65,30 @@ void BiJiaCOMBThread::startEnd()
     req.setHeader(QNetworkRequest::ContentLengthHeader,contentLength);
     req.setHeader(QNetworkRequest::SetCookieHeader,QVariant(cookie));
 
-    qDebug()<<" contentLength:  "<<content<<" post url"<<url2;
+    //qDebug()<<" contentLength:  "<<content<<" post url"<<url2;
     manager->post(req,content);
 }
 
 void BiJiaCOMBThread::replyFinished(QNetworkReply *reply)
 {
 //    qDebug()<<"BiJiaCOMBThread  replyFinished "<<reply->rawHeaderList();
-//    foreach (QByteArray arr, reply->rawHeaderList()) {
-//        qDebug()<<" header "<<arr << "-------> " <<reply->rawHeader(arr);
-//    }
+    foreach (QByteArray arr, reply->rawHeaderList()) {
+        //qDebug()<<" header "<<arr << "-------> " <<reply->rawHeader(arr);
+    }
     if(reply->error() ==QNetworkReply::NoError && isFirst){
         cookie = reply->rawHeader("Set-Cookie");
-        qDebug()<<"第一次返回 "<<cookie;
-        startEnd();
-        isFirst = false;
+        qDebug()<<"BiJiaCOMBThread第一次返回 "<<cookie;
+        if(!cookie.isEmpty()){
+            startEnd();
+            isFirst = false;
+        }else{
+            emit signalSendFinalData("",false);
+        }
     }
     if(!isFirst){       
         QByteArray arr = reply->readAll();
-        //qDebug()<<"第二次返回 "<<arr;
-        //emit signalMessageShow(tr("正在返回最终的数据............"));
+        qDebug()<<"BiJiaCOMBThread第二次返回 ";
+        //emit signalMessageShow(QStringLiteral("正在返回最终的数据............"));
         emit signalSendFinalData(arr,false);
         QFile file("./com.html");
         if(file.exists()){

@@ -1,5 +1,9 @@
 ﻿#include "bijiaarkthread.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
+#else
+#define QStringLiteral(str)  QString::fromUtf8(str)
+#endif
 BiJiaARKThread::BiJiaARKThread(QObject *parent) :
     QThread(parent),isFirst(true),manager(NULL)
 {
@@ -21,7 +25,7 @@ void BiJiaARKThread::setCode(const QString &code)
 
 void BiJiaARKThread::startSplider(const QUrl& url)
 {
-    qDebug()<<" BiJiaARKThread startLoad "<<url;
+    qDebug()<<QStringLiteral("ARKFM开始请求数据:请求地址为: ")<<url;
     manager->get(QNetworkRequest(url));
 }
 
@@ -32,10 +36,10 @@ void BiJiaARKThread::initManager()
 
 void BiJiaARKThread::replyFinished(QNetworkReply *reply)
 {
-    qDebug()<<" BiJiaARKThread replyFinished "<<reply->errorString();
+//    qDebug()<<" BiJiaARKThread replyFinished "<<reply->errorString();
     //网页重定向
     QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    qDebug()<<"BiJiaARKThread redirectionTarget "<<redirectionTarget;
+//    qDebug()<<"BiJiaARKThread redirectionTarget "<<redirectionTarget;
     if (!redirectionTarget.isNull())
     {
         QUrl newUrl = reply->url().resolved(redirectionTarget.toUrl());

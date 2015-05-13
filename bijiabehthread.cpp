@@ -1,5 +1,9 @@
 ﻿#include "BiJiaBehThread.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
+#else
+#define QStringLiteral(str)  QString::fromUtf8(str)
+#endif
 BiJiaBehThread::BiJiaBehThread(QObject *parent) :
     QThread(parent),isFirst(true),manager(NULL)
 {
@@ -21,14 +25,14 @@ void BiJiaBehThread::setCode(const QString &code)
 
 void BiJiaBehThread::startSplider(const QUrl& url)
 {
-    qDebug()<<" startLoad "<<url;
+    qDebug()<<QStringLiteral("BEHRM开始请求数据:请求地址为: ")<<url;
     manager->get(QNetworkRequest(url));
-    emit signalMessageShow(tr("正在获取数据............"));
+    emit signalMessageShow(QStringLiteral("正在获取数据............"));
 }
 
 void BiJiaBehThread::secondStart(const QUrl &url)
 {
-    emit signalMessageShow(tr("正在第二次获取最终数据............"));
+    emit signalMessageShow(QStringLiteral("正在第二次获取最终数据............"));
     startSplider(url);
 }
 
@@ -39,10 +43,10 @@ void BiJiaBehThread::initManager()
 
 void BiJiaBehThread::replyFinished(QNetworkReply *reply)
 {
-    qDebug()<<"BiJiaBehThread  replyFinished "<<reply->errorString();
+//    qDebug()<<"BiJiaBehThread  replyFinished "<<reply->errorString();
     //网页重定向
     QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    qDebug()<<"BiJiaBehThread redirectionTarget "<<isFirst;
+    //qDebug()<<"BiJiaBehThread redirectionTarget "<<isFirst;
     if (!redirectionTarget.isNull())
     {
         QUrl newUrl = reply->url().resolved(redirectionTarget.toUrl());
@@ -63,12 +67,12 @@ void BiJiaBehThread::replyFinished(QNetworkReply *reply)
         return ;
     }
     if(reply->error() ==QNetworkReply::NoError && isFirst){
-        emit signalMessageShow(tr("正在返回准备的数据............"));
+        emit signalMessageShow(QStringLiteral("正在返回准备的数据............"));
         emit signalSendFinalData(reply->readAll(),true);
         isFirst = false;
     }
     if(!isFirst){
-        emit signalMessageShow(tr("正在返回最终的数据............"));
+        emit signalMessageShow(QStringLiteral("正在返回最终的数据............"));
         emit signalSendFinalData(reply->readAll(),false);
     }
 }

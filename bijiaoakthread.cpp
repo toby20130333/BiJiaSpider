@@ -1,5 +1,9 @@
 ﻿#include "bijiaoakthread.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
+#else
+#define QStringLiteral(str)  QString::fromUtf8(str)
+#endif
 BiJiaOAKThread::BiJiaOAKThread(QObject *parent) :
     QThread(parent),isFirst(true),manager(NULL)
 {
@@ -24,21 +28,17 @@ void BiJiaOAKThread::setCode(const QString &code)
 ///
 void BiJiaOAKThread::startSplider(const QUrl& url)
 {
-    qDebug()<<" BiJiaOAKThread startLoad "<<url;
+    qDebug()<<QStringLiteral("OAKCHEMICAL开始请求数据:请求地址为: ")<<url;
     QUrl url2(url);
-//    url2.setPort(443);
     QNetworkRequest req;
     req.setUrl(url2);
-//    QSslConfiguration conf = req.sslConfiguration();
-//    conf.setProtocol(QSsl::SslV3);
-//    req.setSslConfiguration(conf);
     manager->get(req);
-    emit signalMessageShow(tr("正在获取数据............"));
+    emit signalMessageShow(QStringLiteral("OAK正在获取数据............"));
 }
 
 void BiJiaOAKThread::secondStart(const QUrl &url)
 {
-    emit signalMessageShow(tr("正在第二次获取最终数据............"));
+    emit signalMessageShow(QStringLiteral("OAK正在第二次获取最终数据............"));
     startSplider(url);
 }
 
@@ -49,36 +49,36 @@ void BiJiaOAKThread::initManager()
 
 void BiJiaOAKThread::replyFinished(QNetworkReply *reply)
 {
-    qDebug()<<"BiJiaOAKThread-----  replyFinished "<<reply->readAll();
+//    qDebug()<<"BiJiaOAKThread-----  replyFinished "<<reply->readAll();
     //网页重定向
-    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    qDebug()<<"BiJiaBehThread redirectionTarget "<<redirectionTarget;
-    if (!redirectionTarget.isNull())
-    {
-        QUrl newUrl = reply->url().resolved(redirectionTarget.toUrl());
-        QString realUrl;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        QUrlQuery query(newUrl);
-         realUrl =query.queryItemValue("catalogno");
-#else
-         realUrl =newUrl.queryItemValue("catalogno");
-#endif
-        qDebug()<<"BiJiaBehThread redirectionTarget catalogno "<<realUrl;
-        if(realUrl.isEmpty()){
-            qDebug()<<"BiJiaBehThread redirectionTarget catalogno22222 "<<realUrl;
-            return;
-        }
-        realUrl.prepend(OAKCHEMIL_URL);
-        startSplider(realUrl);
-        return ;
-    }
+//    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+//    qDebug()<<"BiJiaBehThread redirectionTarget "<<redirectionTarget;
+//    if (!redirectionTarget.isNull())
+//    {
+//        QUrl newUrl = reply->url().resolved(redirectionTarget.toUrl());
+//        QString realUrl;
+//#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+//        QUrlQuery query(newUrl);
+//         realUrl =query.queryItemValue("catalogno");
+//#else
+//         realUrl =newUrl.queryItemValue("catalogno");
+//#endif
+//        qDebug()<<"BiJiaBehThread redirectionTarget catalogno "<<realUrl;
+//        if(realUrl.isEmpty()){
+//            qDebug()<<"BiJiaBehThread redirectionTarget catalogno22222 "<<realUrl;
+//            return;
+//        }
+//        realUrl.prepend(OAKCHEMIL_URL);
+//        startSplider(realUrl);
+//        return ;
+//    }
     if(reply->error() ==QNetworkReply::NoError && isFirst){
-        emit signalMessageShow(tr("正在返回准备的数据............"));
+        emit signalMessageShow(QStringLiteral("正在返回准备的数据............"));
         emit signalSendFinalData(reply->readAll(),true);
         isFirst = false;
     }
     if(!isFirst){
-        emit signalMessageShow(tr("正在返回最终的数据............"));
+        emit signalMessageShow(QStringLiteral("正在返回最终的数据............"));
         emit signalSendFinalData(reply->readAll(),false);
     }
 }

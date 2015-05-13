@@ -23,7 +23,7 @@
 #include "bijiabehthread.h"
 #include "bijiacombthread.h"
 #include "bijiaoakthread.h"
-
+#include "drop_shadow_widget.h"
 #define ARKPHARM_URL   "http://www.arkpharminc.com/web/search.html?s=1&keyword="
 #define BEPHARM_URL     "http://www.bepharm.com/en/Search.html?searchValue="
 #define COMBLOCKS_URL "http://www.combi-blocks.com/cgi-bin/find.cgi"
@@ -77,13 +77,21 @@ public slots:
     void operatorData(DATA_M stu);
 private slots:
     void on_pushButton_clicked();
-//    void replyFinished(QNetworkReply*);
     void setCurrentCas(QString);
+    void on_closeBtn_clicked();
+
 private:
     Ui::Widget *ui;
     WEBSITE_TYPE iType;
     QList<DATA_M> dataStuList;
     bool isFirstBe;
+    QPoint move_point; //移动的距离
+    bool mouse_press; //按下鼠标左键
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
 };
 
 #endif // WIDGET_H
