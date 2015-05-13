@@ -34,6 +34,10 @@ Widget::Widget(QWidget *parent) :
 
 Widget::~Widget()
 {
+    if(m_View){
+        m_View->deleteLater();
+        m_View = NULL;
+    }
     delete ui;
 }
 
