@@ -7,12 +7,14 @@ Widget::Widget(QWidget *parent) :
     isFirstBe(false),
     m_ARK(NULL),
     m_BEH(NULL),
-    m_COMB(NULL)
+    m_COMB(NULL),
+    m_OAK(NULL)
 {
     ui->setupUi(this);
     arkIsOK = false;
     behIsOk  = false;
     comBlOk = false;
+    oakOK = false;
     m_View =new  QWebView();
     QStringList lst;
     initThreeThreads();
@@ -47,6 +49,9 @@ void Widget::initThreeThreads()
 
     m_COMB = new BiJiaCOMBThread(0);
     connect(m_COMB,SIGNAL(signalSendFinalData(QByteArray,bool)),this,SLOT(parseComBlock(QByteArray,bool)));
+    m_OAK = new BiJiaOAKThread(0);
+    connect(m_OAK,SIGNAL(signalSendFinalData(QByteArray,bool)),this,SLOT(parseOAkChemical(QByteArray,bool)));
+    connect(m_OAK,SIGNAL(signalMessageShow(QString)),this,SLOT(appendStatus(QString)));
 
 
 }
@@ -87,7 +92,7 @@ void Widget::parseArk(const QByteArray &arr)
     for(int i = 0;i<elst.count();i++){
         QString value = elst.at(i).attribute("value");
         QString id = elst.at(i).attribute("id");
-        qDebug()<<"-------------ARKPHARM data--------------- "<<value<< " \n"<<id;
+        //qDebug()<<"-------------ARKPHARM data--------------- "<<value<< " \n"<<id;
         if(id.contains("Hidden") || id.contains("WeightValue") || value.isEmpty()){
             continue;
         }
@@ -110,7 +115,7 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
     QWebElement document = frame->documentElement();
     if(isFirst){
         ui->textEdit_2->clear();
-        examineChildElements(document);
+        examineChildElements(document,true);
     }else{
         QWebElementCollection introSpans = document.findAll("input[type=hidden]");
         QList<QWebElement> elst = introSpans.toList();
@@ -119,7 +124,7 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
         for(int i = 0;i<elst.count();i++){
             QString value = elst.at(i).attribute("value");
             QString id = elst.at(i).attribute("id");
-            qDebug()<<"-------------BEPHARM data--------------- "<<value<< " \n"<<id;
+            //qDebug()<<"-------------BEPHARM data--------------- "<<value<< " \n"<<id;
             if(id.isEmpty() || value.isEmpty() || id.contains("WeightValue")){
                 continue;
             }else{
@@ -163,6 +168,39 @@ void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
     }
 }
 
+void Widget::parseOAkChemical(const QByteArray &arr, bool isFirst)
+{
+    QWebFrame *frame =m_View->page()->mainFrame();
+    frame->setHtml(QString(arr));
+    QWebElement document = frame->documentElement();
+    if(isFirst){
+        ui->textEdit_4->clear();
+        examineChildElements(document,false);
+    }else{
+        QWebElementCollection introSpans = document.findAll("input[type=hidden]");
+        QList<QWebElement> elst = introSpans.toList();
+        QStringList secondResult;
+        secondResult.clear();
+        for(int i = 0;i<elst.count();i++){
+            QString value = elst.at(i).attribute("value");
+            QString id = elst.at(i).attribute("id");
+            //qDebug()<<"-------------BEPHARM data--------------- "<<value<< " \n"<<id;
+            if(id.isEmpty() || value.isEmpty() || id.contains("WeightValue")){
+                continue;
+            }else{
+//                ui->textEdit_2->append(tr("未找到该产品价格"));
+//                ui->label_5->setText(tr("未找到该产品价格"));
+            }
+            ui->textEdit_4->append(value);
+        }
+        oakOK = true;
+        if(arkIsOK && behIsOk && comBlOk){
+            ui->pushButton->setEnabled(true);
+            ui->label_5->setText(tr("搜索完成,请仔细查看搜索结果"));
+        }
+    }
+}
+
 void Widget::appendStatus(QString msg)
 {
     ui->label_5->setText(msg);
@@ -186,15 +224,18 @@ void Widget::on_pushButton_clicked()
     m_ARK->setCode(ui->lineEdit->text());
     m_BEH->setCode(ui->lineEdit->text());
     m_COMB->setCode(ui->lineEdit->text());
+    m_OAK->setCode(ui->lineEdit->text());
     if(!isFirstBe){
         m_ARK->start();
         m_BEH->start();
         m_COMB->start();
+        m_OAK->start();
         isFirstBe = true;
     }else{
         m_ARK->slotStart();
         m_BEH->slotStart();
         m_COMB->slotStart();
+        m_OAK->slotStart();
     }
 }
 
@@ -204,8 +245,9 @@ void Widget::setCurrentCas(QString cas)
 }
 //! [traverse document]
 //! 解析beh第一次请求回来的内容
-void Widget::examineChildElements(const QWebElement &parentElement)
+void Widget::examineChildElements(const QWebElement &parentElement,bool isBeh)
 {
+    if(isBeh){
     QWebElement firstTextInput = parentElement.findFirst("img[class=cart_img1]");
     QString storedText = firstTextInput.attribute("src");
     QStringList lst = storedText.split("/");
@@ -222,5 +264,9 @@ void Widget::examineChildElements(const QWebElement &parentElement)
     }
     if(m_BEH){
         m_BEH->secondStart(QUrl(beUrl));
+    }
+    }else{
+        //解析oakchemical数据
+
     }
 }

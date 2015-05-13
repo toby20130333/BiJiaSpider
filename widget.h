@@ -22,6 +22,7 @@
 #include "bijiaarkthread.h"
 #include "bijiabehthread.h"
 #include "bijiacombthread.h"
+#include "bijiaoakthread.h"
 
 #define ARKPHARM_URL   "http://www.arkpharminc.com/web/search.html?s=1&keyword="
 #define BEPHARM_URL     "http://www.bepharm.com/en/Search.html?searchValue="
@@ -60,15 +61,17 @@ public:
     BiJiaARKThread* m_ARK;
     BiJiaBehThread* m_BEH;
     BiJiaCOMBThread* m_COMB;
-
+    BiJiaOAKThread* m_OAK;
     bool arkIsOK;
     bool behIsOk;
     bool comBlOk;
+    bool oakOK;
 public slots:
-    void examineChildElements(const QWebElement &parentElement);
+    void examineChildElements(const QWebElement &parentElement, bool isBeh);
     void parseArk(const QByteArray& arr);
     void parseBeh(const QByteArray& arr,bool isFirst);
     void parseComBlock(const QByteArray& arr,bool isFirst);
+    void parseOAkChemical(const QByteArray& arr,bool isFirst);
 
     void appendStatus(QString);
     void operatorData(DATA_M stu);
