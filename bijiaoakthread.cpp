@@ -50,28 +50,6 @@ void BiJiaOAKThread::initManager()
 void BiJiaOAKThread::replyFinished(QNetworkReply *reply)
 {
 //    qDebug()<<"BiJiaOAKThread-----  replyFinished "<<reply->readAll();
-    //网页重定向
-//    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-//    qDebug()<<"BiJiaBehThread redirectionTarget "<<redirectionTarget;
-//    if (!redirectionTarget.isNull())
-//    {
-//        QUrl newUrl = reply->url().resolved(redirectionTarget.toUrl());
-//        QString realUrl;
-//#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-//        QUrlQuery query(newUrl);
-//         realUrl =query.queryItemValue("catalogno");
-//#else
-//         realUrl =newUrl.queryItemValue("catalogno");
-//#endif
-//        qDebug()<<"BiJiaBehThread redirectionTarget catalogno "<<realUrl;
-//        if(realUrl.isEmpty()){
-//            qDebug()<<"BiJiaBehThread redirectionTarget catalogno22222 "<<realUrl;
-//            return;
-//        }
-//        realUrl.prepend(OAKCHEMIL_URL);
-//        startSplider(realUrl);
-//        return ;
-//    }
     if(reply->error() ==QNetworkReply::NoError && isFirst){
         emit signalMessageShow(QStringLiteral("正在返回准备的数据............"));
         emit signalSendFinalData(reply->readAll(),true);

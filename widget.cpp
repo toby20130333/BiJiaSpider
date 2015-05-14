@@ -24,6 +24,7 @@ Widget::Widget(QWidget *parent) :
     behIsOk  = false;
     comBlOk = false;
     oakOK = false;
+    aokOK = false;
     m_View =new  QWebView();
     QStringList lst;
     initThreeThreads();
@@ -36,11 +37,11 @@ Widget::Widget(QWidget *parent) :
     qDebug()<<" opened? "<<ok;
     connect(ui->comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(setCurrentCas(QString)));
     QSqlQuery query("SELECT cas FROM arkdata order by id limit 200");
-      while (query.next()) {
-          QString country = query.value(0).toString();
-          lst.append(country);
-      }
-      ui->comboBox->addItems(lst);
+    while (query.next()) {
+        QString country = query.value(0).toString();
+        lst.append(country);
+    }
+    ui->comboBox->addItems(lst);
 }
 
 Widget::~Widget()
@@ -66,7 +67,12 @@ void Widget::initThreeThreads()
     connect(m_OAK,SIGNAL(signalSendFinalData(QByteArray,bool)),this,SLOT(parseOAkChemical(QByteArray,bool)));
     connect(m_OAK,SIGNAL(signalMessageShow(QString)),this,SLOT(appendStatus(QString)));
 
+    m_AOK =  new BiJiaAOKThread(0);
+    connect(m_AOK,SIGNAL(signalSendFinalData(QByteArray)),this,SLOT(parseAoK(QByteArray)));
 
+    m_Astatech = new BiJiaAstatechThread(0);
+    connect(m_Astatech,SIGNAL(signalSendFinalData(QByteArray,bool)),this,SLOT(parseAstatech(QByteArray,bool)));
+    connect(m_Astatech,SIGNAL(signalMessageShow(QString)),this,SLOT(appendStatus(QString)));
 }
 void Widget::setUrl(const QUrl &url)
 {
@@ -117,9 +123,9 @@ void Widget::parseArk(const QByteArray &arr)
     arkIsOK = true;
     qDebug()<<QStringLiteral("ARK价格获取完毕--------------------------------");
 
-    if(arkIsOK && behIsOk && comBlOk && oakOK){
+    if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
         ui->pushButton->setEnabled(true);
-        ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
+        ui->label_5->setText(QStringLiteral("ARK最后搜索完成,请仔细查看搜索结果"));
     }
 }
 
@@ -143,25 +149,26 @@ void Widget::parseBeh(const QByteArray &arr, bool isFirst)
             if(id.isEmpty() || value.isEmpty() || id.contains("WeightValue")){
                 continue;
             }else{
-//                ui->textEdit_2->append(tr("未找到该产品价格"));
-//                ui->label_5->setText(tr("未找到该产品价格"));
+                //                ui->textEdit_2->append(tr("未找到该产品价格"));
+                //                ui->label_5->setText(tr("未找到该产品价格"));
+                ui->textEdit_2->append(value);
             }
-            ui->textEdit_2->append(value);
+
         }
         behIsOk = true;
         qDebug()<<QStringLiteral("BEHM价格获取完毕--------------------------------");
 
-        if(arkIsOK && behIsOk && comBlOk && oakOK){
+        if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
             ui->pushButton->setEnabled(true);
-            ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
+            ui->label_5->setText(QStringLiteral("BEHM最后搜索完成,请仔细查看搜索结果"));
         }
     }
 }
 
 void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
 {
-//    qDebug()<<"parseComBlock "<<arr.size();
-//    ui->textEdit_3->setText(QStringLiteral(arr));
+    //    qDebug()<<"parseComBlock "<<arr.size();
+    //    ui->textEdit_3->setText(QStringLiteral(arr));
     QWebFrame *frame =m_View->page()->mainFrame();
     frame->setHtml((arr));
     QWebElement document = frame->documentElement();
@@ -180,9 +187,9 @@ void Widget::parseComBlock(const QByteArray &arr, bool isFirst)
     }
     qDebug()<<QStringLiteral("COMBLOCKS价格获取完毕--------------------------------");
     comBlOk = true;
-    if(arkIsOK && behIsOk && comBlOk && oakOK){
+    if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
         ui->pushButton->setEnabled(true);
-        ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
+        ui->label_5->setText(QStringLiteral("COM最后搜索完成,请仔细查看搜索结果"));
     }
 }
 
@@ -214,9 +221,84 @@ void Widget::parseOAkChemical(const QByteArray &arr, bool isFirst)
         if(arr.isEmpty()){
             ui->textEdit_4->setText(QStringLiteral("未找到相关产品"));
         }
-        if(arkIsOK && behIsOk && comBlOk && oakOK){
+        if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
             ui->pushButton->setEnabled(true);
-            ui->label_5->setText(QStringLiteral("搜索完成,请仔细查看搜索结果"));
+            ui->label_5->setText(QStringLiteral("OAK最后搜索完成,请仔细查看搜索结果"));
+        }
+    }
+}
+
+void Widget::parseAoK(const QByteArray &arr)
+{
+    QWebFrame *frame =m_View->page()->mainFrame();
+    frame->setHtml((arr));
+    QWebElement document = frame->documentElement();
+    QWebElementCollection introSpans = document.findAll("input[type=hidden]");
+    QList<QWebElement> elst = introSpans.toList();
+    ui->textEdit_5->clear();
+    for(int i = 0;i<elst.count();i++){
+        QString value = elst.at(i).attribute("value");
+        QString name = elst.at(i).attribute("name");
+        //qDebug()<<"-------------ARKPHARM data--------------- "<<value<< " \n"<<name;
+        if(name.contains("pno") || name.contains("producte") || value.isEmpty()){
+            continue;
+        }
+        if(name == "cas"){
+            value.prepend("cas:");
+        }
+        ui->textEdit_5->append(value);
+    }
+    if(elst.isEmpty()){
+        ui->textEdit_5->append(QStringLiteral("未找到相关产品"));
+    }
+    aokOK = true;
+    qDebug()<<QStringLiteral("AOK价格获取完毕--------------------------------");
+
+    if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
+        ui->pushButton->setEnabled(true);
+        ui->label_5->setText(QStringLiteral("AOK最后搜索完成,请仔细查看搜索结果"));
+    }
+}
+
+void Widget::parseAstatech(const QByteArray &arr, bool isFirst)
+{
+    QWebFrame *frame =m_View->page()->mainFrame();
+    frame->setHtml(arr);
+    QWebElement document = frame->documentElement();
+    if(isFirst){
+        ui->textEdit_6->clear();
+        examineChildElementsOfAstatech(document,true);
+    }else{
+        QWebElementCollection introSpans = document.findAll("tr.bg_tr td");
+        QList<QWebElement> elst = introSpans.toList();
+        qDebug()<<"-------------parseAstatech data----------count----- "<<elst.count();
+        QStringList secondResult;
+        secondResult.clear();
+        for(int i = 0;i<elst.count();i++){
+            if(elst.at(i).hasAttributes()){
+                qDebug()<<"I have some attributes"<<elst.at(i).toPlainText();
+                continue;
+            }
+            if(elst.at(i).hasAttribute("A")){
+                qDebug()<<"I have A attribute"<<elst.at(i).toPlainText();
+                continue;
+            }
+            QString value = elst.at(i).toPlainText();
+            value  = value.trimmed();
+            qDebug()<<"-------------parseAstatech data------i--------- "<<i<<" "<<value;
+            if(value.isEmpty() || value.contains("%") || (value.contains("acid")) || value.contains("Please") || value.contains(ui->lineEdit->text())){
+                continue;
+            }else{
+                ui->textEdit_6->append(value);
+            }
+
+        }
+        astateChOK = true;
+        qDebug()<<QStringLiteral("AstateCh价格获取完毕--------------------------------");
+
+        if(arkIsOK && behIsOk && comBlOk && oakOK && aokOK && astateChOK){
+            ui->pushButton->setEnabled(true);
+            ui->label_5->setText(QStringLiteral("AstateCh最后搜索完成,请仔细查看搜索结果"));
         }
     }
 }
@@ -238,24 +320,46 @@ void Widget::operatorData(DATA_M stu)
     query.bindValue(":rate", stu.value);
     qDebug()<<" exec status is :"<<query.exec();
 }
+///
+/// \brief Widget::on_pushButton_clicked
+/// 点击请求按钮进行数据请求
+/// 同时情况之前的请求和返回的数据
+///
 void Widget::on_pushButton_clicked()
 {
     ui->pushButton->setEnabled(false);
+    if(ui->lineEdit->text().isEmpty()){
+        return;
+    }
     m_ARK->setCode(ui->lineEdit->text());
     m_BEH->setCode(ui->lineEdit->text());
-    m_COMB->setCode(ui->lineEdit->text());
     m_OAK->setCode(ui->lineEdit->text());
+    m_AOK->setCode(ui->lineEdit->text());
+    m_Astatech->setCode(ui->lineEdit->text());
+    m_COMB->setCode(ui->lineEdit->text(),ui->lineEdit_3->text(),ui->lineEdit_2->text());
+    //每次重新请求，都得清空之前的内容
+    ui->textEdit->clear();
+    ui->textEdit_2->clear();
+    ui->textEdit_3->clear();
+    ui->textEdit_4->clear();
+    ui->textEdit_5->clear();
+    ui->label_5->setText("开始请求数据...");
     if(!isFirstBe){
         m_ARK->start();
         m_BEH->start();
         m_COMB->start();
         m_OAK->start();
+        m_AOK->start();
+        m_Astatech->start();
         isFirstBe = true;
     }else{
+        m_COMB->setCode(ui->lineEdit->text(),ui->lineEdit_3->text(),ui->lineEdit_2->text());
         m_ARK->slotStart();
         m_BEH->slotStart();
         m_COMB->slotStart();
         m_OAK->slotStart();
+        m_AOK->slotStart();
+        m_Astatech->slotStart();
     }
 }
 
@@ -268,27 +372,56 @@ void Widget::setCurrentCas(QString cas)
 void Widget::examineChildElements(const QWebElement &parentElement,bool isBeh)
 {
     if(isBeh){
-    QWebElement firstTextInput = parentElement.findFirst("img[class=cart_img1]");
-    QString storedText = firstTextInput.attribute("src");
-    QStringList lst = storedText.split("/");
-    storedText = lst.at(lst.count()-1);
-    storedText = storedText.mid(0,storedText.count()-4);
-    qDebug()<<"in it.....Widget::examineChildElements......."<<storedText;
-    QString beUrl = "/en/productview.html?catalogno=";
-    beUrl.prepend("http://www.bepharm.com");
-    beUrl.append(storedText);
-    if(storedText.isEmpty()){
-        ui->textEdit_2->append(QStringLiteral("未找到相关产品信息"));
-        ui->label_5->setText(QStringLiteral("未找到相关产品信息"));
-        return;
-    }
-    if(m_BEH){
-        m_BEH->secondStart(QUrl(beUrl));
-    }
+        QWebElement firstTextInput = parentElement.findFirst("img[class=cart_img1]");
+        QString storedText = firstTextInput.attribute("src");
+        QStringList lst = storedText.split("/");
+        storedText = lst.at(lst.count()-1);
+        storedText = storedText.mid(0,storedText.count()-4);
+        qDebug()<<"in it.....Widget::examineChildElements......."<<storedText;
+        QString beUrl = "/en/productview.html?catalogno=";
+        beUrl.prepend("http://www.bepharm.com");
+        beUrl.append(storedText);
+        if(storedText.isEmpty()){
+            ui->textEdit_2->append(QStringLiteral("未找到相关产品信息"));
+            ui->label_5->setText(QStringLiteral("未找到相关产品信息"));
+            return;
+        }
+        if(m_BEH){
+            m_BEH->secondStart(QUrl(beUrl));
+        }
     }else{
         //解析oakchemical数据
         m_OAK->secondStart(QUrl(""));
     }
+}
+
+void Widget::examineChildElementsOfAstatech(const QWebElement &parentElement, bool isBeh)
+{
+
+    QWebElementCollection introSpans = parentElement.findAll("DIV.cpbh a");
+    QList<QWebElement> elst = introSpans.toList();
+    qDebug()<<"-------------examineChildElementsOfAstatech data------in--------- "<<elst.count();
+    QStringList secondResult;
+    secondResult.clear();
+    for(int i = 0;i<elst.count();i++){
+        QString value = elst.at(i).attribute("href");
+        QString id = elst.at(i).attribute("title");
+        qDebug()<<"-------------examineChildElementsOfAstatech data--------------- "<<value<< " \n"<<id;
+        if(id.isEmpty() || value.isEmpty()){
+            continue;
+        }else{
+            secondResult.append(value);
+        }
+
+    }
+    if(m_Astatech){
+        if(secondResult.count() >=2){
+            m_Astatech->secondStart(secondResult.at(1));
+        }else{
+            ui->textEdit_6->setText(QStringLiteral("未找到相关产品信息"));
+        }
+    }
+
 }
 void Widget::paintEvent(QPaintEvent *)
 {

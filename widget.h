@@ -11,7 +11,8 @@
 #include <QUrl>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-
+#include <QMouseEvent>
+#include <QtMath>
 #include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QUrlQuery>
@@ -23,7 +24,9 @@
 #include "bijiabehthread.h"
 #include "bijiacombthread.h"
 #include "bijiaoakthread.h"
-#include "drop_shadow_widget.h"
+#include "bijiaaokthread.h"
+#include "bijiaastatechthread.h"
+
 #define ARKPHARM_URL   "http://www.arkpharminc.com/web/search.html?s=1&keyword="
 #define BEPHARM_URL     "http://www.bepharm.com/en/Search.html?searchValue="
 #define COMBLOCKS_URL "http://www.combi-blocks.com/cgi-bin/find.cgi"
@@ -62,16 +65,28 @@ public:
     BiJiaBehThread* m_BEH;
     BiJiaCOMBThread* m_COMB;
     BiJiaOAKThread* m_OAK;
+    BiJiaAOKThread* m_AOK;
+    BiJiaAstatechThread* m_Astatech;
+
     bool arkIsOK;
     bool behIsOk;
     bool comBlOk;
     bool oakOK;
+    bool aokOK;
+    bool astateChOK;
+
 public slots:
     void examineChildElements(const QWebElement &parentElement, bool isBeh);
+
+    void examineChildElementsOfAstatech(const QWebElement &parentElement, bool isBeh);
+
+
     void parseArk(const QByteArray& arr);
     void parseBeh(const QByteArray& arr,bool isFirst);
     void parseComBlock(const QByteArray& arr,bool isFirst);
     void parseOAkChemical(const QByteArray& arr,bool isFirst);
+    void parseAoK(const QByteArray& arr);
+    void parseAstatech(const QByteArray& arr,bool isFirst);
 
     void appendStatus(QString);
     void operatorData(DATA_M stu);
