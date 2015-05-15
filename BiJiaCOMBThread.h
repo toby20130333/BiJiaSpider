@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QUrl>
+#include <QSslConfiguration>
 #include <QDebug>
 #include <QFile>
 #include <QVariant>
@@ -26,12 +27,16 @@ public:
     explicit BiJiaCOMBThread(QObject *parent = 0);
     ~BiJiaCOMBThread();
     QNetworkAccessManager* manager;
-    void setCode(const QString& code);
+    void setCode(const QString& code,const QString& username,const QString& passwd);
     void startSplider(const QUrl &url);
     void startEnd();
     QString m_Code;
+    QString m_username;
+    QString m_passwd;
     bool isFirst;
     QByteArray cookie;
+    bool isSecond;
+    bool isLogin;
 signals:
     void signalStart();
     void signalSendFinalData(const QByteArray& arr,bool isFirst);
