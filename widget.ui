@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>800</height>
+    <width>392</width>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -369,7 +369,7 @@ QTextEdit{
         </size>
        </property>
        <property name="text">
-        <string>TCI:</string>
+        <string>ASTate</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -425,7 +425,7 @@ QTextEdit{
        </property>
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -453,6 +453,19 @@ QTextEdit{
        </property>
        <property name="text">
         <string>进行比价</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="updateButton">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>检查更新</string>
        </property>
       </widget>
      </item>

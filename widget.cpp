@@ -1,5 +1,6 @@
 ﻿#include "widget.h"
 #include "ui_widget.h"
+#include "fervor/fvupdater.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
 #else
@@ -25,6 +26,10 @@ Widget::Widget(QWidget *parent) :
     comBlOk = false;
     oakOK = false;
     aokOK = false;
+
+    connect(ui->updateButton, SIGNAL(clicked()),
+            FvUpdater::sharedUpdater(), SLOT(CheckForUpdatesNotSilent()));
+
     m_View =new  QWebView();
     QStringList lst;
     initThreeThreads();
