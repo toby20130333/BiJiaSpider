@@ -16,9 +16,13 @@ Widget::Widget(QWidget *parent) :
     m_OAK(NULL)
 {
     ui->setupUi(this);
-
+#if defined(Q_OS_WIN)
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
+#endif
+#if defined(Q_OS_OSX)
+    ui->closeBtn->setVisible(false);
+#endif
     //初始化为未按下鼠标左键
     mouse_press = false;
     arkIsOK = false;
@@ -428,8 +432,9 @@ void Widget::examineChildElementsOfAstatech(const QWebElement &parentElement, bo
     }
 
 }
-void Widget::paintEvent(QPaintEvent *)
+void Widget::paintEvent(QPaintEvent *e)
 {
+#if defined(Q_OS_WIN)
     QPainterPath path;
     path.setFillRule(Qt::WindingFill);
     int rate = 8;
@@ -449,6 +454,8 @@ void Widget::paintEvent(QPaintEvent *)
         painter.setPen(color);
         painter.drawPath(path);
     }
+#endif
+    QWidget::paintEvent(e);
 }
 
 void Widget::mousePressEvent(QMouseEvent *event)

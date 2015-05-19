@@ -15,7 +15,7 @@ TEMPLATE = app
 
 # Fervor autoupdater
 # (set TARGET and VERSION of your app before including Fervor.pri)
-!include("../fervor/Fervor.pri") {
+!include("./fervor/fervor.pri") {
         error("Unable to include Fervor autoupdater.")
 }
 
@@ -28,7 +28,6 @@ SOURCES += main.cpp\
     bijiabehthread.cpp \
     bijiacombthread.cpp \
     bijiaoakthread.cpp \
-    drop_shadow_widget.cpp \
     bijiaaokthread.cpp \
     bijiaastatechthread.cpp
 
@@ -37,7 +36,6 @@ HEADERS  += widget.h \
     bijiabehthread.h \
     bijiacombthread.h \
     bijiaoakthread.h \
-    drop_shadow_widget.h \
     bijiaaokthread.h \
     bijiaastatechthread.h
 
@@ -46,5 +44,5 @@ FORMS    += widget.ui
 DISTFILES += \
     comblocks.html
 
-RESOURCES += \
-    bijia.qrc
+#RESOURCES += \
+#    bijia.qrc
