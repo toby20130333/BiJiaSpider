@@ -1,0 +1,88 @@
+﻿QTabWidget::pane { /* The tab widget frame */
+    border-top: 0px solid #1BAE1F;
+}
+
+QTabWidget::tab-bar {
+    left: 0px; /* move to the right by 5px */
+}
+
+/* Style the tab using the tab sub-control. Note that
+    it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+    border: 1px solid #C4C4C3;
+    border-bottom-color: #C2C7CB; /* same as the pane color */
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    min-width: 40px;
+    padding: 2px;
+    height: 24px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: #464646;
+    color:white;
+}
+
+QTabBar::tab:selected {
+    border-color: #9B9B9B;
+    border-bottom-color: #C2C7CB; /* same as pane color */
+}
+
+QTabBar::tab:!selected {
+    margin-top: 1px; /* make non-selected tabs look smaller */
+}
+QPushButton {
+    background-color: #1BAE1F;
+    border-width: 1px;
+    border-style: outset;
+    border-color: beige;
+    color:black;
+}
+QPushButton:hover{
+    background-color: #404040;
+    border-width: 0px;
+    border-color: beige;
+    color:white;
+}
+QLabel{
+   color:#414141;
+}
+QToolButton { /* all types of tool button */
+    border: 1px solid #8f8f91;
+    border-radius: 2px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
+}
+QToolButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+#closetool:hover{
+    background-color: #404040;
+    border-style: outset;
+    border-width: 0px;
+    background-image: url(:/close_pressed.png);
+}
+#closetool{
+    border-style: outset;
+    border-width: 0px;
+    border-color: beige;
+    width:27px;
+    height:24px;
+    background-image: url(:/close_hover.png);
+}
+QTableWidget {
+    background-color:#D4D4D4 ;
+}
+
+QTableWidget::item {
+    border: 2px solid grey;
+    background-color:gray;
+}
+
+QHeaderView, QHeaderView::section {
+    background-color: #D4D4D4;
+}
