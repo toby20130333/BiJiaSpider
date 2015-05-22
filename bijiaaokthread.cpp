@@ -61,15 +61,6 @@ void BiJiaAOKThread::replyFinished(QNetworkReply *reply)
     qDebug()<<"BiJiaAOKThread redirectionTarget "<<redirectionTarget;
     if(reply->error() ==QNetworkReply::NoError ){
         emit signalSendFinalData(arr);
-        QFile file("./aok.html");
-        if(file.exists()){
-            //qDebug()<<"BiJiaCOMBThread  remove "<<reply->rawHeaderList();
-            file.remove();
-        }
-        if(file.open(QIODevice::WriteOnly)){
-            file.write(arr);
-        }
-        file.close();
     }
 }
 

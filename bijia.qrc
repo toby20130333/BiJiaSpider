@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>close_hover.png</file>
+        <file>close_pressed.png</file>
+        <file>download.png</file>
+        <file>updater.png</file>
+        <file>logo.png</file>
+        <file>bijia.qss</file>
+        <file>bijiaupdate.qss</file>
+        <file>bjmain.qss</file>
+        <file>down.png</file>
+        <file>up.png</file>
+    </qresource>
+</RCC>

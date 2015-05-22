@@ -1,0 +1,31 @@
+#include <windows.h>
+IDI_ICON1               ICON    DISCARDABLE     "logo.ico"
+VS_VERSION_INFO     VERSIONINFO
+FILEVERSION         1, 0, 0, 1
+PRODUCTVERSION      1, 0, 0, 1
+FILEFLAGSMASK       0x3fL
+FILEFLAGS           0
+FILEOS              VOS_NT_WINDOWS32
+FILETYPE            VFT_APP
+FILESUBTYPE         VFT2_UNKNOWN
+BEGIN
+    BLOCK   "VarFileInfo"
+    BEGIN
+        VALUE   "Translation",  0x409,  1200
+    END
+    BLOCK   "StringFileInfo"
+    BEGIN
+        BLOCK   "040904b0"
+        BEGIN
+            VALUE   "CompanyName",      "上海多多指教技术有限公司\0"
+            VALUE   "FileDescription",  "比价工具客户端\0"
+            VALUE   "FileVersion",      "1.0.1-alpha\0"
+            VALUE   "InternalName",     "多多指教-Heilqt\0"
+            VALUE   "LegalCopyright",   "Copyright 2015 by Heilqt\0"
+            VALUE   "OriginalFilename", "BiJiaTools.exe\0"
+            VALUE   "ProductName",      "比价工具\0"
+            VALUE   "ProductVersion",   "1.0.1-alpha\0"
+            VALUE   "Language", "中国(简体)\0"
+        END
+    END
+END
