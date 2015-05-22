@@ -382,9 +382,9 @@ void BJWidget::slotRecevieMsg(MessageType type, const QString &msg2)
     {
         msg = tr("用户拒绝");
     }break;
-        if(m_Tray){
-            m_Tray->showMessage(msg,msg2);
-        }
+    }
+    if(m_Tray){
+        m_Tray->showMessage(msg,msg2);
     }
 }
 ///
