@@ -12,7 +12,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QMouseEvent>
-
+#include "chat/chat.h"
 #include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QUrlQuery>
@@ -97,6 +97,8 @@ public slots:
 
     void appendStatus(QString);
     void operatorData(DATA_M stu);
+
+    void slotRecevieMsg(MessageType type,const QString& msg);
 private slots:
     void on_pushButton_clicked();
     void setCurrentCas(QString);

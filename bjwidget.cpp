@@ -18,8 +18,8 @@ BJWidget::BJWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 #if defined(Q_OS_WIN)
-//    setWindowFlags(Qt::FramelessWindowHint);
-//    setAttribute(Qt::WA_TranslucentBackground);
+    //    setWindowFlags(Qt::FramelessWindowHint);
+    //    setAttribute(Qt::WA_TranslucentBackground);
     ui->closeBtn->setVisible(false);
 #endif
 #if defined(Q_OS_OSX)
@@ -100,11 +100,11 @@ void BJWidget::initDatabase()
 void BJWidget::initTrayicon()
 {
     if(m_Tray == NULL){
-          m_Tray = new SystemTray(this);
-          connect(m_Tray, SIGNAL(showWidget()),
-                  FvUpdater::sharedUpdater(), SLOT(CheckForUpdatesNotSilent()));
-          connect(m_Tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(slotActivated(QSystemTrayIcon::ActivationReason)));
-      }
+        m_Tray = new SystemTray(this);
+        connect(m_Tray, SIGNAL(showWidget()),
+                FvUpdater::sharedUpdater(), SLOT(CheckForUpdatesNotSilent()));
+        connect(m_Tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(slotActivated(QSystemTrayIcon::ActivationReason)));
+    }
     connect(ui->updateButton, SIGNAL(clicked()),
             FvUpdater::sharedUpdater(), SLOT(CheckForUpdatesNotSilent()));
 }
@@ -150,7 +150,7 @@ void BJWidget::parseArk(const QByteArray &arr)
             continue;
         }
         if(!value.contains(ARKPHARM_URL)){
-           ui->textEdit->append(value);
+            ui->textEdit->append(value);
         }else{
             ui->textEdit->append(QStringLiteral("未找到相关产品"));
         }
@@ -357,6 +357,35 @@ void BJWidget::operatorData(DATA_M stu)
     query.bindValue(":price",stu.price);
     query.bindValue(":rate", stu.value);
     qDebug()<<" exec status is :"<<query.exec();
+}
+
+void BJWidget::slotRecevieMsg(MessageType type, const QString &msg2)
+{
+    qDebug()<<" slotRecevieMsg------"<<msg2;
+    QString msg = "";
+    switch(type)
+    {
+    case Message:
+    {
+
+    }break;
+    case NewParticipant:
+    {
+        msg = tr("新用户加入");
+    }break;
+    case ParticipantLeft:
+    {
+        msg = tr("用户离开");
+
+    }break;
+    case Refuse:
+    {
+        msg = tr("用户拒绝");
+    }break;
+        if(m_Tray){
+            m_Tray->showMessage(msg,msg2);
+        }
+    }
 }
 ///
 /// \brief BJWidget::on_pushButton_clicked
