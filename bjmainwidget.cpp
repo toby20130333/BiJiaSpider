@@ -12,6 +12,12 @@ BJMainWidget::BJMainWidget(QWidget *parent) :
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     //    ui->closeBtn->setVisible(false);
+    closeBtn = new QToolButton(this);
+    closeBtn->setObjectName("closetool");
+    closeBtn->setAutoRaise(true);
+    closeBtn->resize(27,22);
+    closeBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    connect(closeBtn,SIGNAL(clicked()),qApp,SLOT(quit()));
 #endif
 #if defined(Q_OS_OSX)
     //    ui->closeBtn->setVisible(false);
@@ -24,19 +30,17 @@ BJMainWidget::BJMainWidget(QWidget *parent) :
 
     bjChatWid = new BJChatWidget(this);
     bjWidget = new BJWidget(this);
+
+    connect(bjChatWid,SIGNAL(sendMessageType(MessageType,QString)),bjWidget,SLOT(slotRecevieMsg(MessageType,QString)));
+    connect(this,SIGNAL(closeApp()),bjChatWid,SLOT(slotCloseSocket()));
     stackedWidget = new QTabWidget(this);
-    closeBtn = new QToolButton(this);
-//    closeBtn->setDefaultAction(new QAction("X",0));
-    closeBtn->setObjectName("closetool");
-    closeBtn->setAutoRaise(true);
-    closeBtn->resize(27,22);
-    closeBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(closeBtn,SIGNAL(clicked()),qApp,SLOT(quit()));
+
 
     stackedWidget->addTab(bjChatWid,tr("局域网IM"));
     stackedWidget->addTab(bjWidget,tr("比价"));
+#if defined(Q_OS_WIN)
     stackedWidget->setCornerWidget(closeBtn, Qt::TopRightCorner);
-
+#endif
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(stackedWidget);
     layout->setSpacing(0);
@@ -73,6 +77,12 @@ void BJMainWidget::paintEvent(QPaintEvent *e)
     }
 #endif
     QWidget::paintEvent(e);
+}
+
+void BJMainWidget::closeEvent(QCloseEvent *e)
+{
+    emit closeApp();
+    qApp->quit();
 }
 
 void BJMainWidget::mousePressEvent(QMouseEvent *event)

@@ -25,7 +25,7 @@ public:
     QString getMessage();
     chat* privatechat;
     chat* privatechat1;
-
+    QTimer *timer;
 protected:
     void changeEvent(QEvent *e);
     void sendMessage(MessageType type,QString serverAddress="");
@@ -67,8 +67,13 @@ private slots:
     void processPendingDatagrams();
     void sentFileName(QString);
     void currentFormatChanged(const QTextCharFormat &format);
+    void slotSendNewsIn();
 private:
     Ui::BJChatWidget *ui;
+signals:
+    void sendMessageType(MessageType type,const QString& msg);
+public slots:
+    void slotCloseSocket();
 };
 
 #endif // BJCHATWIDGET_H
