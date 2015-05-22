@@ -26,6 +26,9 @@ BJChatWidget::BJChatWidget(QWidget *parent) :
     connect(server,SIGNAL(sendFileName(QString)),this,SLOT(sentFileName(QString)));
     connect(ui->textEdit,SIGNAL(currentCharFormatChanged(QTextCharFormat)),this,SLOT(currentFormatChanged(const QTextCharFormat)));
 
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(slotSendNewsIn()));
+    timer->start(10000);
 }
 
 void BJChatWidget::currentFormatChanged(const QTextCharFormat &format)
@@ -46,6 +49,16 @@ void BJChatWidget::currentFormatChanged(const QTextCharFormat &format)
     ui->textitalic->setChecked(format.font().italic());
     ui->textUnderline->setChecked(format.font().underline());
     color = format.foreground().color();
+}
+//保持10s发一次，以便在此客户端登陆后再登陆的用户收不到此客户端已登陆的消息
+void BJChatWidget::slotSendNewsIn()
+{
+    sendMessage(NewParticipant);
+}
+
+void BJChatWidget::slotCloseSocket()
+{
+    sendMessage(ParticipantLeft);
 }
 
 void BJChatWidget::processPendingDatagrams()   //接收数据UDP
@@ -133,12 +146,14 @@ void BJChatWidget::newParticipant(QString userName,QString localHostName,QString
         ui->textBrowser->append(tr("%1 在线！").arg(localHostName));
         ui->onlineUser->setText(tr("在线人数：%1").arg(ui->tableWidget->rowCount()));
         sendMessage(NewParticipant);
+        emit sendMessageType(NewParticipant,localHostName);
     }
 }
 
 //处理用户离开
 void BJChatWidget::participantLeft(QString /*userName*/,QString localHostName,QString time)
-{
+{    
+    emit sendMessageType(ParticipantLeft,localHostName);
     int rowNum = ui->tableWidget->findItems(localHostName,Qt::MatchExactly).first()->row();
     ui->tableWidget->removeRow(rowNum);
     ui->textBrowser->setTextColor(Qt::gray);
@@ -263,7 +278,7 @@ QString BJChatWidget::getMessage()  //获得要发送的信息
 
 void BJChatWidget::closeEvent(QCloseEvent *)
 {
-    sendMessage(ParticipantLeft);
+//    sendMessage(ParticipantLeft);
 }
 
 void BJChatWidget::sentFileName(QString fileName)

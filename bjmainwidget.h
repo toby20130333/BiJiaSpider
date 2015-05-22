@@ -30,6 +30,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     virtual void paintEvent(QPaintEvent *event);
+    void closeEvent(QCloseEvent* e);
+signals:
+    void closeApp();
 };
 
 #endif // BJMAINWIDGET_H
