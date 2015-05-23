@@ -14,8 +14,8 @@
 #else
 #include <QtGui>
 #endif
-#define AOK_URL   "http://www.aokbio.com/searche.php"
-#define AOKFINAL_URL    "http://www.arkpharminc.com/default.ashx?xmls=lib/stockprice.xmls&method=getstock&GoodsCode="
+#define AOK_URL   ""
+#define AOKFINAL_URL    ""
 
 class BiJiaAOKThread : public QThread
 {

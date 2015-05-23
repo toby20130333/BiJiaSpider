@@ -13,7 +13,7 @@
 #else
 #include <QtGui>
 #endif
-#define OAKCHEMIL_URL    "http://oakwoodchemical.com/ProductsList.aspx?txtSearch="
+#define OAKCHEMIL_URL    ""
 
 class BiJiaOAKThread : public QThread
 {
