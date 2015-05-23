@@ -13,7 +13,7 @@
 #else
 #include <QtGui>
 #endif
-#define BEPHARM_URL    "http://www.bepharm.com/en/Search.html?searchValue="
+#define BEPHARM_URL    ""
 
 class BiJiaBehThread : public QThread
 {

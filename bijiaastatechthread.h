@@ -14,8 +14,8 @@
 #else
 #include <QtGui>
 #endif
-#define ASTATECH_URL    "http://astatech.com.cn/english/index.php/Search/index/category/0/kw/"
-#define END_URL            "/search_type/1/type/goods/p/0/psize/0/price/0.html"
+#define ASTATECH_URL    ""
+#define END_URL            ""
 
 class BiJiaAstatechThread : public QThread
 {

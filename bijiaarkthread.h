@@ -13,8 +13,8 @@
 #else
 #include <QtGui>
 #endif
-#define ARKPHARM_URL   "http://www.arkpharminc.com/web/search.html?s=1&keyword="
-#define ARKFINAL_URL    "http://www.arkpharminc.com/default.ashx?xmls=lib/stockprice.xmls&method=getstock&GoodsCode="
+#define ARKPHARM_URL   ""
+#define ARKFINAL_URL    ""
 
 class BiJiaARKThread : public QThread
 {
